@@ -5,8 +5,10 @@ hello:
     .asciz "Hello world, the ANSWER is 42! @[]`{}~\n"
 
 application:
+    push {lr}
     ldr r0, =hello
     bl print_asciz
+    pop {pc}
 
 print_asciz:
     push {r5, lr}
