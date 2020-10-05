@@ -40,7 +40,7 @@ public:
 
             if (now > time + second_us) {
                 render_all_hands(render::erase);
-                set_clock_on_interact();
+                set_clock_on_interaction();
                 update_clock();
                 render_all_hands();
                 display.flush();
@@ -75,10 +75,6 @@ private:
     static constexpr auto dial_coords{
         cache::lookup<hwlib::xy, max_hours>{coord_from_degree}
     };
-    static constexpr auto sec_coords{
-        cache::lookup<hwlib::xy, max_time_units>{
-            coord_from_degree<font_size>
-    }};
     static constexpr auto min_coords{
         cache::lookup<hwlib::xy, max_time_units>{
             coord_from_degree<font_size>
@@ -92,7 +88,7 @@ private:
         erase = false
     };
 
-    void set_clock_on_interact() {
+    void set_clock_on_interaction() {
         if (not mins_button.read()) {
             update_mins_hours();
         } else if (not hours_button.read()) {
@@ -132,7 +128,7 @@ private:
     void render_all_hands(
         render action = render::draw
     ) const {
-        render_hand(sec_coords[seconds], action);
+        render_hand(min_coords[seconds], action);
         render_hand(min_coords[minutes], action);
         render_hand(hour_coords[hours], action);
     }
