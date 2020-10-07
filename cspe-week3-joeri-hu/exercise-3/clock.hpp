@@ -8,7 +8,7 @@
 namespace drawable {
  
 // can't seem to compile this without instantiating it :(
-template<typename T = void>
+//template<typename T = void>
 class clock {
 private:
     hwlib::window& display;
@@ -36,7 +36,7 @@ public:
         draw_dials();
  
         for (auto time{hwlib::now_us()}, now{time};; now = hwlib::now_us()) {
-            auto constexpr second_us{1'000'000};
+            constexpr auto second_us{1'000'000};
 
             if (now > time + second_us) {
                 render_all_hands(render::erase);
@@ -72,16 +72,15 @@ private:
                 -R * hwmath::cos(hwmath::radian_from_degree(degree)))};
     }
 
-    static constexpr auto dial_coords{
-        cache::lookup<hwlib::xy, max_hours>{coord_from_degree}
-    };
-    static constexpr auto min_coords{
-        cache::lookup<hwlib::xy, max_time_units>{
-            coord_from_degree<font_size>
-    }};
-    static constexpr auto hour_coords{
-        cache::lookup<hwlib::xy, max_time_units>{
-            coord_from_degree<font_size * 2>}};
+    static constexpr cache::lookup<hwlib::xy, max_hours> dial_coords(
+        coord_from_degree
+    );
+    static constexpr cache::lookup<hwlib::xy, max_time_units> min_coords(
+        coord_from_degree<font_size>
+    );
+    static constexpr cache::lookup<hwlib::xy, max_time_units> hour_coords(
+        coord_from_degree<font_size * 2>
+    );
 
     enum class render : bool {
         draw = true,

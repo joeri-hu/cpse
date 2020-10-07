@@ -10,7 +10,7 @@
 
 # source & header files in this project (main.cpp is automatically assumed)
 
-generator: generator.o note_player_convert.o rtttl_player_desktop.o
+generator.exe: generator.o note_player_convert.o rtttl_player_desktop.o
 	g++ -std=c++17 generator.o note_player_convert.o rtttl_player_desktop.o -o generator.exe
 
 generator.o: generator.cpp note.hpp melody.hpp note_player.hpp note_player_convert.hpp rtttl_player.hpp
@@ -22,7 +22,7 @@ note_player_convert.o: note_player_convert.cpp note_player_convert.hpp note_play
 rtttl_player_desktop.o: rtttl_player.cpp rtttl_player.hpp note_player.hpp note.hpp
 	g++ -std=c++17 -c rtttl_player.cpp -o rtttl_player_desktop.o
 
-melody.cpp: generator
+melody.cpp: generator.exe
 	generator
 
 HEADERS += note.hpp

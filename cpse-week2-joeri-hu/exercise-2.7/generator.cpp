@@ -20,5 +20,5 @@ void generate_melody(std::string melody) {
 }
 
 int main() {
-    generate_melody(let_it_be);
+    generate_melody(rickroll);
 }
