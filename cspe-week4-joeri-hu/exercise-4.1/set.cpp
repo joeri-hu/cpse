@@ -25,6 +25,7 @@ void set::remove(int thing) {
         if (stuff[spot] == thing) {
             shift(spot);
             --tally;
+            return;
         }
     }
 }
