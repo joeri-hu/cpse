@@ -1,59 +1,68 @@
-    .global application
+.global application
 
 hello:
-    .asciz "Hello world, Zhe ANSWER is 42! @[]`{}~\n"
+    .asciz "Hello world, the ANSWER is 42! @[]`{}~\n"
+
+.align 2
 
 application:
-    push {lr}
-    ldr r0, =hello
-    bl print_asciz
-    pop {pc}
+    push   {lr}
+    ldr    r0, =hello
+    bl     print_asciz
+    pop    {pc}
 
 print_asciz:
-    push {r5, lr}
-    mov r5, r0
+    push   {r4, lr}
+    mov    r4, r0
 loop:
-    ldrb r0, [r5]
-    add r0, r0, #0
-    beq done
-    bl convert_char
-    bl uart_put_char
-    add r5, r5, #1
-    b loop
+    ldrb   r0, [r4]
+    cmp    r0, #0
+    beq    done
+    bl     convert_char
+    bl     uart_put_char
+    add    r4, #1
+    b      loop
 done:
-    pop {r5, pc}
+    pop    {r4, pc}
 
 convert_char:
-    .syntax unified
-    push {r1-r2, lr}
-upper_check:
-    mov r2, r0
-    mov r0, #'A' - 1
-    mov r1, #'Z' + 1
-    bl check_range
-    bne convert
-lower_check:
-    mov r0, #'a' - 1
-    mov r1, #'z' + 1
-    bl check_range
-    beq exit
+    push   {r4, lr}
+    mov    r4, r0
+@ upper_check:
+    mov    r0, r4
+    mov    r1, #'A' - 1
+    mov    r2, #'Z' + 1
+    bl     check_range
+    bcc    convert
+@ lower_check:
+    mov    r0, r4
+    mov    r1, #'a' - 1
+    mov    r2, #'z' + 1
+    bl     check_range
+    bcs    end
 convert:
-    eor r2, r2, #'a' - 'A'
-exit:
-    mov r0, r2
-    pop {r1-r2, pc}
+    mov    r0, #'a' - 'A'
+    eor    r4, r0
+end:
+    mov    r0, r4
+    pop    {r4, pc}
 
-@ parameters
-@   r0 .... lower bound
-@   r1 .... upper bound
-@   r2 .... value to check
+@ check_range
 @
-@ returns
-@   when out of range, Z flag is set
+@ description
+@   when out of range, carry flag is set:
+@
+@   uint num, min, max;
+@   CF = min - max >= num - max;
+@   // CF = num > low and num < max;
+@
+@ parameters
+@   r0 .... number to check
+@   r1 .... minimum
+@   r2 .... maximum
+@
 check_range:
-    push {r0-r2, lr}
-    subs r2, r2, r1
-    subs r0, r0, r1
-    cmp r0, r2
-    sbcs r1, r1, r1
-    pop {r0-r2, pc}
+    sub    r1, r2    @ min -= max;
+    sub    r0, r2    @ num -= max;
+    cmp    r1, r0    @ CF = min >= num;
+    mov    pc, lr
