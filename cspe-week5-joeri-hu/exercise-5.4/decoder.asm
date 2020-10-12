@@ -1,7 +1,7 @@
 .global decoder
 .global read_asm
 
-.equ buff_size, 100              @ #define buff_length 100
+.equ buff_size, 100              @ #define buff_size 100
 
 .bss
 .align 4
