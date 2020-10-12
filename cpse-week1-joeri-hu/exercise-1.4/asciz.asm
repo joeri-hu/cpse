@@ -28,13 +28,13 @@ done:
 convert_char:
     push   {r4, lr}
     mov    r4, r0
-@ upper_check:
+@upper_check:
     mov    r0, r4
     mov    r1, #'A' - 1
     mov    r2, #'Z' + 1
     bl     check_range
     bcc    convert
-@ lower_check:
+@lower_check:
     mov    r0, r4
     mov    r1, #'a' - 1
     mov    r2, #'z' + 1
@@ -65,4 +65,4 @@ check_range:
     sub    r1, r2    @ min -= max;
     sub    r0, r2    @ num -= max;
     cmp    r1, r0    @ CF = min >= num;
-    mov    pc, lr
+    bx     lr
