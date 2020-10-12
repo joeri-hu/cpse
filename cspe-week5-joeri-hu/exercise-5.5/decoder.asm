@@ -42,7 +42,7 @@ decompress:
 decomp:                          @
     blx    r4                    @ letter = read_loc()
     tst    r0, r0                @ ZF = letter == '\0' ? 1 : 0
-    beq    done_decomp           @ if ZF == 1 goto done_decom
+    beq    done_decomp           @ if ZF == 1 goto done_decomp
     cmp    r0, #'@'              @ ZF = letter == '@' ? 1 : 0
     beq    decomp_match          @ if ZF == 1 goto decomp_match
 @decomp_char:                    @
@@ -96,7 +96,7 @@ write_buff:                      @
     cmp    r1, r0                @ ZF = pbuff_end == pbuff ? 1 : 0
     beq    done_char             @ if ZF == 1 goto done_char
     sub    r2, #1                @ --pbuff_end_prev
-    ldrb   r3, [r2]              @ letter = pbuff_end_prev
+    ldrb   r3, [r2]              @ letter = *pbuff_end_prev
     strb   r3, [r1]              @ *pbuff_end = letter
     sub    r1, #1                @ --pbuff_end
     b      write_buff            @ continue
