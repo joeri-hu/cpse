@@ -64,16 +64,16 @@ done_decomp:                     @
 @ r1 = write function
 @ r2 = match.offset
 add_match:
-    push   {r4-r6, lr}           @ pbuff_match, write_lc, match_lc.length
-    ldr    r4, =buffer           @ pbuff_match = &buffer
-    add    r4, r2                @ pbuff_match += match.offset
+    push   {r4-r6, lr}           @ pbuff, write_lc, match_lc.length
+    ldr    r4, =buffer           @ pbuff = &buffer
+    add    r4, r2                @ pbuff += match.offset
     mov    r5, r1                @ write_lc = write
     mov    r6, r0                @ match_lc.length = match.length
 expand:                          @
     tst    r6, r6                @ zflag = match_lc.length == 0 ? 1 : 0
     beq    done_match            @ if zflag == 1 goto done_match
     sub    r6, #1                @ --match_lc.length
-    ldrb   r0, [r4]              @ letter = *pbuff_match
+    ldrb   r0, [r4]              @ letter = *pbuff
     mov    r1, r5                @ write = write_lc
     bl     add_char              @ add_char(letter, write)
     b      expand                @ continue
@@ -89,15 +89,13 @@ add_char:
     ldr    r0, =buffer           @ pbuff = &buffer
     mov    r1, r0                @ pbuff_end = pbuff
     add    r1, #buff_size - 1    @ pbuff_end += buff_size - 1
-    mov    r2, r1                @ pbuff_prev = pbuff_end
 write_buff:                      @
-    cmp    r1, r0                @ zflag = pbuff_end == pbuff ? 1 : 0
+    cmp    r0, r1                @ zflag = pbuff_end == pbuff ? 1 : 0
     beq    done_char             @ if zflag == 1 goto done_char
-    sub    r2, #1                @ --pbuff_prev
-    ldrb   r3, [r2]              @ letter = *pbuff_prev
-    strb   r3, [r1]              @ *pbuff_end = letter
     sub    r1, #1                @ --pbuff_end
+    ldrb   r2, [r1]              @ letter = *pbuff_end
+    strb   r2, [r1, #1]          @ *(pbuff_end + 1) = letter
     b      write_buff            @ continue
 done_char:                       @
-    strb   r4, [r0]              @ *pbuff = letter_lc
+    strb   r4, [r0]              @ *pbuff = letter
     pop    {r4, pc}              @ return void
