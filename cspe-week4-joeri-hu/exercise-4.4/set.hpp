@@ -62,11 +62,11 @@ public:
         std::array<char, 3> const& other
     ) {
         for (size_t spot = 0; spot < stuff.size(); ++spot) {
-            if (stuff[spot] < other[spot]) {
-                return false;
+            if (stuff[spot] > other[spot]) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     friend std::ostream& operator<<(
