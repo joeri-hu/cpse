@@ -1,51 +1,49 @@
 .global application
 
-hello:
+message:
     .asciz "Hello world, the ANSWER is 42! @[]`{}~\n"
 
 .align 2
-
 application:
     push   {lr}
-    ldr    r0, =hello
-    bl     print_asciz
-    pop    {pc}
+    ldr    r0, =hello            @ pmsg = &message
+    bl     print_asciz           @ print_asciz(pmsg)
+    pop    {pc}                  @ return void
 
 print_asciz:
-    push   {r4, lr}
-    mov    r4, r0
+    push   {r4, lr}              @ pmsg_lc
+    mov    r4, r0                @ pmsg_lc = pmsg
 loop:
-    ldrb   r0, [r4]
-    cmp    r0, #0
-    beq    done
-    bl     convert_char
-    bl     uart_put_char
-    add    r4, #1
-    b      loop
-done:
-    pop    {r4, pc}
+    ldrb   r0, [r4]              @ letter = *pmsg_lc
+    tst    r0, r0                @ zflag = letter == 0 ? 1 : 0
+    beq    done                  @ if zflag == 1 goto done
+    bl     convert_char          @ convert_char(letter)
+    bl     uart_put_char         @ uart_put_char(letter)
+    add    r4, #1                @ ++pmsg_lc
+    b      loop                  @ continue
+done:                            @
+    pop    {r4, pc}              @ return void
 
 convert_char:
-    push   {r4, lr}
-    mov    r4, r0
-@upper_check:
-    mov    r0, r4
-    mov    r1, #'A' - 1
-    mov    r2, #'Z' + 1
-    bl     check_range
-    bcc    convert
-@lower_check:
-    mov    r0, r4
-    mov    r1, #'a' - 1
-    mov    r2, #'z' + 1
-    bl     check_range
-    bcs    end
-convert:
-    mov    r0, #'a' - 'A'
-    eor    r4, r0
-end:
-    mov    r0, r4
-    pop    {r4, pc}
+    push   {r4, lr}              @ letter_lc
+    mov    r4, r0                @ letter_lc = letter
+@upper_check:                    @
+    mov    r1, #'A' - 1          @ min = 'A' - 1
+    mov    r2, #'Z' + 1          @ max = 'Z' + 1
+    bl     check_range           @ check_range(letter, min, max)
+    bcc    convert               @ if cflag == 0 goto convert
+@lower_check:                    @
+    mov    r0, r4                @ letter = letter_lc
+    mov    r1, #'a' - 1          @ min = 'a' - 1
+    mov    r2, #'z' + 1          @ max = 'z' + 1
+    bl     check_range           @ check_range(letter, min, max)
+    bcs    end                   @ if cflag == 1 goto end
+convert:                         @
+    mov    r0, #'a' - 'A'        @ caps_bit = 'a' - 'A'
+    eor    r4, r0                @ letter_lc xor_eq caps_bit
+end:                             @
+    mov    r0, r4                @ letter = letter_lc
+    pop    {r4, pc}              @ return letter
 
 @ check_range
 @
@@ -62,7 +60,7 @@ end:
 @   r2 .... maximum
 @
 check_range:
-    sub    r1, r2    @ min -= max;
-    sub    r0, r2    @ num -= max;
-    cmp    r1, r0    @ CF = min >= num;
-    bx     lr
+    sub    r1, r2                @ min -= max
+    sub    r0, r2                @ num -= max
+    cmp    r1, r0                @ cflag = min >= num ? 1 : 0
+    bx     lr                    @ return cflag

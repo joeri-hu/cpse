@@ -10,5 +10,4 @@ extern "C" void uart_put_char(char c) {
 int main() {
     hwlib::wait_ms(1'000);
     application();
-    application();
 }
